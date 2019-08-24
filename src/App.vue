@@ -1,28 +1,27 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    
+    <div id="musicbar-container">
+      <music-bar></music-bar>
+    </div>
   </div>
 </template>
-
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import MusicBar from "components/MusicBar"
 export default {
-  name: 'app',
-  components: {
-    HelloWorld
+  name:"App",
+  components:{
+    MusicBar
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+<style lang="scss">
+#app{
+  overflow: hidden;
+}
+#musicbar-container{
+  position:absolute;
+  bottom:0;
+  width:100%;
 }
 </style>
