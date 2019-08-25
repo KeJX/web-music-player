@@ -1,17 +1,19 @@
 <template>
   <div id="app">
+    <top-bar></top-bar>
+
+     <music-bar></music-bar>
     
-    <div id="musicbar-container">
-      <music-bar></music-bar>
-    </div>
   </div>
 </template>
 <script>
 import MusicBar from "components/MusicBar"
+import TopBar from "components/TopBar"
 export default {
   name:"App",
   components:{
-    MusicBar
+    MusicBar,
+    TopBar
   }
 }
 </script>
@@ -19,9 +21,7 @@ export default {
 #app{
   overflow: hidden;
 }
-#musicbar-container{
-  position:absolute;
-  bottom:0;
-  width:100%;
-}
+
+
+
 </style>

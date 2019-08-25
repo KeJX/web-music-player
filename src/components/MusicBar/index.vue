@@ -7,54 +7,45 @@
       @canplay="_readyToPlay"
     ></audio>
 
-    <div class="audiobar-mini">
-      <kjx-progress class="progress" :percent="percentage" @changePercent="changePercent" />
-      <img :src="`${publicPath}test/music.jpg`" class="music-img" />
-      <div class="music-info">
+   <div class="mini-container">
+      <div class="audiobar-mini">
+      <div class="progress-container">
+        <div class="left-occupy"></div>
+        <kjx-progress class="progress" :percent="percentage" @changePercent="changePercent" />
+      </div>
+      <img :src="`${publicPath}test/music.jpg`" class="music-img" @click="_toggleControl"/>
+      <div class="music-info" @click="_toggleControl">
         <span class="music-name">{{ "白色羽毛"}}</span>
         <span class="singer-name">{{ "芮恩"}}</span>
       </div>
       <i class="control-btn" :class="controlBtnClass" @click="tooggleAudioState"></i>
       <i class="iconfont icon-liebiao list-btn" @click="_toggleMusicList"></i>
     </div>
+   </div>
 
-    <transition name="list">
-      <div class="music-list" v-show="isListShow"  >
-        <kjx-cell class="play-order van-hairline--bottom" :value="'顺序播放(20)'">
-          <i class="iconfont icon-xunhuan" slot="left-icon"></i>
-          <i class="iconfont icon-shanchu" slot="right-icon"></i>
-        </kjx-cell>
 
-        <kjx-scroll id="list-scroll" ref="list">
-          <div class="content">
-            <kjx-cell
-              class="list-item van-hairline--bottom"
-              v-for="(item,i) in list"
-              :key="i"
-              :value="item"
-              
-            >
-              <i class="iconfont icon-shengyin" slot="left-icon"></i>
-              <i class="iconfont icon-shanchu" slot="right-icon"></i>
-            </kjx-cell>
-          </div>
-        </kjx-scroll>
-        <kjx-cell :value="`关闭`" class="close-btn van-hairline--top" @click="_toggleMusicList"></kjx-cell>
-      </div>
+     <transition name="list">
+       <play-list v-show="isListShow" :isListShow="isListShow" :list="list" @toggleMusicList= "_toggleMusicList"></play-list>
     </transition>
+
+    <transition name="control">
+      <normal-control class="normal-container" v-show="isControlShow" @hideEvent="_toggleControl" />
+    </transition>
+   
+   
   </div>
 </template>
 <script>
-import kjxProgress from "../base/Progress";
-import kjxScroll from "../base/Scroll";
-import kjxCell from "../base/Cell";
+import kjxProgress from "@/base/Progress";
+import NormalControl from "./MusicControl"
+import PlayList from "./PlayList"
 export default {
   components: {
     kjxProgress,
-    kjxScroll,
-    kjxCell
+    NormalControl,
+    PlayList
   },
-  created() {},
+  created(){},
   mounted() {
     // 获取audio
     this.audio = this.$refs.audio;
@@ -84,7 +75,10 @@ export default {
         "daoxiang",
         "daoxiang",
         "daoxiang"
-      ]
+      ],
+
+      // normal control
+      isControlShow:false,
     };
   },
   computed: {
@@ -122,68 +116,89 @@ export default {
       this.totalTime = target.duration;
     },
     _toggleMusicList() {
-      console.log(1);
       this.isListShow = !this.isListShow;
+    },
+    _toggleControl(){
+      this.isControlShow = !this.isControlShow
     }
   }
 };
 </script>
-<style lang="scss">
 
-
-
-.audiobar {
-  .music-list {
-    .play-order {
-      .value {
-        margin-left: 20px;
-      }
-    }
-  }
-}
-</style>
 <style lang="scss" scoped>
-@import "../assets/scss/_variable.scss";
-@import "../assets/scss/_mixin.scss";
-$list-height: 400PX;
-$list-info-height: 40PX;
+@import "~assets/scss/_variable.scss";
+@import "~assets/scss/_mixin.scss";
 
-$list-item-height: 40PX;
-
-$list-close-btn-height: 40PX;
 .list-enter-active,
-.list-leave-active{
-  transition: all .5s;
+.list-leave-active {
+  transition: opacity .5s;
 }
 
 .list-enter,
-.list-leave-to
-{
-  transform: translateY($list-height);
+.list-leave-to {
+  opacity: 0;
 }
 
-.list-enter-to,
-.list-leave{
-  transform:translateY(0);
+
+
+.control-enter-active,
+.control-leave-active {
+  transition: opacity 0.5s;
 }
 
+.control-enter,
+.control-leave-to {
+  opacity: 0;
+}
+
+    
+
+.mini-container{
+  position: fixed;
+  bottom: 0;
+  width:100%;
+  box-shadow: 0 0 15px #cecdcd;
+  background: #fff;
+}
+
+.normal-container{
+  position:fixed;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  background-color: #fff;
+}
 
 .audiobar {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  background: #fff;
-  box-shadow: 0 0 15px #cecdcd;
   .audiobar-mini {
     position: relative;
     height: 60px;
     display: flex;
+    justify-content: center;
     align-items: center;
     z-index: $bar_index;
-
-    .progress {
+    .progress-container {
       position: absolute;
       top: -2px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .progress {
+        flex: 1;
+      }
+      .left-occupy,
+      .right-occupy {
+        width: 10px;
+        height: 4px;
+      }
+      .left-occupy {
+        background-color: $main-color;
+      }
+      .right-occupy {
+        background-color: #c1bfbf;
+      }
     }
 
     .music-img {
@@ -224,54 +239,7 @@ $list-close-btn-height: 40PX;
       font-size: 25px;
     }
   }
-
-  .music-list {
-    position: absolute;
-    z-index: $list_index;
-    height: $list-height;
-    width: 100%;
-    bottom: 0;
-    background-color: #fff;
-    border-radius: 20px 20px 0px 0px;
-
-    .play-order {
-      padding: 0 16px;
-      font-size: 16px;
-      height: $list-info-height;
-      .iconfont {
-        font-size: 20px;
-      }
-
-      .list-info {
-        flex: 1 0 50px;
-        text-indent: 30px;
-      }
-    }
-
-    #list-scroll {
-      height: $list-height - $list-info-height - $list-close-btn-height;
-      overflow: hidden;
-      padding: 0 20px;
-      .list-item {
-        @include flexCenter(row);
-        height: $list-item-height;
-
-        .iconfont {
-          color: $main-color;
-        }
-        .icon-shengyin {
-          margin-right: 10px;
-        }
-      }
-    }
-
-    .close-btn {
-      height: $list-close-btn-height;
-      position: absolute;
-      width: 100%;
-      text-align: center;
-    }
-  }
 }
+ 
 </style>
 
